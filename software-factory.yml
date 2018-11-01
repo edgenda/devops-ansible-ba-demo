@@ -1,0 +1,28 @@
+- hosts: all
+  tasks:
+  - import_role: 
+      name: common
+
+- hosts: "host02,host04"
+  tasks:
+  - import_role: 
+      name: jenkins-master
+
+- hosts: host03
+  tasks:
+  - import_role: 
+      name: nexus-repository
+
+- hosts: host01
+  tasks:
+  - name: Configure Jenkins reverse proxy 
+    include_role: 
+      name: reverse-proxy
+    vars:
+      listen: item.listen
+      backend_name: item.backend_name
+      backend_host: item.backend_host
+      backend_port: item.backend_port
+    loop:
+      - { listen: 8008, backend_name: 'jenkins', backend_host: 'host02', backend_port: 8080 }
+      - { listen: 8009, backend_name: 'nexus', backend_host: 'host03', backend_port: 8081 }

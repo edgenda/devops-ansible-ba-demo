@@ -1,0 +1,44 @@
+- import_tasks: redhat.yml
+  when: ansible_os_family == 'RedHat'
+
+- import_tasks: debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure Jenkins service is started
+  become: true
+  service:
+    name: jenkins
+    state: started
+    enabled: yes
+
+- name: Wait for Jenkins to be up
+  wait_for:
+    port: 8080
+    host: 127.0.0.1
+    connect_timeout: 3
+    delay: 3
+    timeout: 30
+
+# - name: switch TCP port to random
+#   become: true
+#   lineinfile:
+#     dest: /var/lib/jenkins/config.xml
+#     regexp: '<slaveAgentPort>'
+#     line: '  <slaveAgentPort>0</slaveAgentPort>'
+
+# - name: Bypass - jenkins.install.InstallUtil.lastExecVersion
+#   become: true
+#   copy: 
+#     src: /var/lib/jenkins/jenkins.install.UpgradeWizard.state
+#     dest: /var/lib/jenkins/jenkins.install.InstallUtil.lastExecVersion
+#     remote_src: true
+
+# - stat: path=/var/lib/jenkins/secrets/initialAdminPassword
+#   become: true
+#   register: adminpassword
+
+# - name: Bypass - initialAdminPassword
+#   become: true
+#   shell: mv /var/lib/jenkins/secrets/initialAdminPassword /root
+#   notify: "Jenkins restart needed"
+#   when: adminpassword.stat.exists == True

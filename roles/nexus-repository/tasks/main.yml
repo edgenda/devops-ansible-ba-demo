@@ -1,0 +1,52 @@
+- name: Add the 'nexus' user
+  become: true
+  user:
+    name: nexus
+    state: present
+
+- name: Create Nexus directory
+  become: true
+  file:
+    path: /opt/nexus
+    state: directory
+    owner: nexus
+    group: nexus
+
+- name: Download and extract Nexus
+  become: true
+  unarchive:
+    creates: /opt/nexus/.installed
+    remote_src: yes
+    src: https://sonatype-download.global.ssl.fastly.net/nexus/3/nexus-3.12.1-01-unix.tar.gz
+    dest: /opt/nexus
+
+- name: Change owner to nexus
+  become: true
+  file:
+    path: /opt/nexus
+    recurse: yes
+    owner: nexus
+    group: nexus
+
+- name: Set Nexus server user
+  become: true
+  lineinfile:
+    path: /opt/nexus/nexus-3.12.1-01/bin/nexus.rc
+    line: run_as_user="nexus"
+
+- name: Create symbolic link for nexus service
+  become: true
+  file:
+    src: /opt/nexus/nexus-3.12.1-01/bin/nexus
+    dest: /etc/init.d/nexus
+    state: link
+  notify: "Nexus restart needed"
+
+- name: Change file handle limits
+  become: true
+  pam_limits:
+    domain: nexus
+    limit_type: soft
+    limit_item: nofile
+    value: 65536
+  notify: "Nexus restart needed"

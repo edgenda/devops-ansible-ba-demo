@@ -1,0 +1,14 @@
+- name: Restart Jenkins
+  listen: "Jenkins restart needed"
+  service:
+    name: jenkins
+    state: started
+
+- name: Wait for Jenkins to be up
+  listen: "Jenkins restart needed"
+  wait_for:
+    port: 8080
+    host: 127.0.0.1
+    connect_timeout: 3
+    delay: 3
+    timeout: 30

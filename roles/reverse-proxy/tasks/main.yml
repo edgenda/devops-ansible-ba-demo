@@ -1,0 +1,32 @@
+- name: Install EPEL
+  become: true
+  yum:
+    name: epel-release
+    state: latest
+    update_cache: yes
+
+- name: Install Nginx
+  become: true
+  yum:
+    name: nginx
+    state: latest
+    update_cache: yes
+
+- name: Ensure Nginx service is started
+  become: true
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Add config template to the Nginx available sites
+  become: true
+  template:
+    src: templates/backend.conf
+    dest: "/etc/nginx/conf.d/{{ backend_name }}.conf"
+    backup: yes
+  notify: "Nginx configuration changed"
+
+- name: Test configuration
+  become: true
+  shell: nginx -t

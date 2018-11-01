@@ -1,0 +1,6 @@
+- name: Install tar
+  become: true
+  apt:
+    name: tar
+    state: latest
+    update_cache: yes

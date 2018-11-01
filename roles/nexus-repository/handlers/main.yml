@@ -1,0 +1,16 @@
+- name: Restart Nexus service
+  become: true
+  listen: "Nexus restart needed"
+  service:
+    name: nexus
+    state: restarted
+    enabled: yes
+
+- name: Wait for Nexus to be up
+  listen: "Nexus restart needed"
+  wait_for:
+    port: 8081
+    host: 127.0.0.1
+    connect_timeout: 3
+    delay: 3
+    timeout: 30

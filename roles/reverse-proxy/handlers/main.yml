@@ -1,0 +1,6 @@
+- name: Reload configuration
+  become: true
+  listen: "Nginx configuration changed"
+  service:
+    name: nginx
+    state: restarted

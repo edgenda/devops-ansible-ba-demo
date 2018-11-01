@@ -1,0 +1,12 @@
+- name: Restart server
+  listen: "Reboot needed"
+  command: 'sleep 1 && shutdown -r now "Reboot triggered by Ansible" && sleep 1'
+  async: 1
+  poll: 0
+  become: true
+
+- name: Wait for server to restart
+  listen: "Reboot needed"
+  wait_for_connection:
+    delay: 10
+    timeout: 300
