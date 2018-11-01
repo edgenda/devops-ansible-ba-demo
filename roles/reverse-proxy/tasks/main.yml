@@ -19,14 +19,32 @@
     state: started
     enabled: yes
 
-- name: Add config template to the Nginx available sites
-  become: true
-  template:
-    src: templates/backend.conf
-    dest: "/etc/nginx/conf.d/{{ backend_name }}.conf"
-    backup: yes
-  notify: "Nginx configuration changed"
-
-- name: Test configuration
-  become: true
-  shell: nginx -t
+- block:
+  - name: "Check if config file exists"
+    stat: "path=/etc/nginx/conf.d/{{ backend_name }}.conf"
+    register: conf_exists
+  - name: Add config template to the Nginx available sites
+    become: true
+    template:
+      src: templates/backend.conf
+      dest: "/etc/nginx/conf.d/{{ backend_name }}.conf"
+      backup: yes
+    notify: "Nginx configuration changed"
+  - name: Test configuration
+    become: true
+    shell: nginx -t
+  rescue:
+  - name: "Get backup file name"
+    shell: "ls /etc/nginx/conf.d/{{ backend_name }}.conf.* | sort | sed -n 1p"
+    when: conf_exists.stat.exists == True
+    become: true
+    register: backup_file_name
+  - debug: 
+      msg: "Backup file: {{ backup_file_name.stdout }}"
+  - name: "Restore file"
+    copy:
+      src: "{{ backup_file_name.stdout }}"
+      dest: "/etc/nginx/conf.d/{{ backend_name }}.conf"
+      remote_src: yes
+    become: true
+    when: conf_exists.stat.exists == True
