@@ -1,17 +1,17 @@
-# - hosts: all
-#   tasks:
-#   - import_role: 
-#       name: common
+- hosts: all
+  tasks:
+  - import_role: 
+      name: common
 
-# - hosts: "host02,host04"
-#   tasks:
-#   - import_role: 
-#       name: jenkins-master
+- hosts: "host02,host04"
+  tasks:
+  - import_role: 
+      name: jenkins-master
 
-# - hosts: host03
-#   tasks:
-#   - import_role: 
-#       name: nexus-repository
+- hosts: host03
+  tasks:
+  - import_role: 
+      name: nexus-repository
 
 - hosts: host01
   tasks:
