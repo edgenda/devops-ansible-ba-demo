@@ -15,7 +15,7 @@
 - name: Download and extract Nexus
   become: true
   unarchive:
-    creates: /opt/nexus/.installed
+    creates: /opt/nexus/nexus-3.12.1-01
     remote_src: yes
     src: https://sonatype-download.global.ssl.fastly.net/nexus/3/nexus-3.12.1-01-unix.tar.gz
     dest: /opt/nexus
